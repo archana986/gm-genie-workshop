@@ -11,7 +11,7 @@ Before running this prompt:
 1. Run **notebook 01** (`01_setup_data`) to create the manufacturing tables.
 2. Have your **SQL warehouse ID** ready (from the warehouse URL or `databricks warehouses list`).
 3. Install both skills in `.assistant/skills/`:
-   - `gm-genie-manufacturing-context/SKILL.md`
+   - `manufacturing-genie-context/SKILL.md`
    - `genie-space-builder/SKILL.md`
 
 ---
@@ -22,7 +22,7 @@ Before running this prompt:
 I need you to create a Databricks Genie SQL space for manufacturing analytics using the REST API.
 
 Here are my details:
-- Catalog: gm_ama_demos
+- Catalog: workshop_demo
 - Schema: genie_workshop_manufacturing
 - Warehouse ID: <paste your warehouse ID here>
 
@@ -76,7 +76,7 @@ Make sure to follow the serialized_space v2 structure exactly — tables sorted,
 ### Minimal prompt (for experienced users)
 
 ```
-Create a Genie space on catalog `gm_ama_demos`, schema `genie_workshop_manufacturing`, warehouse `<ID>`. Attach all 7 tables. Use the genie-space-builder skill for the API pattern. Write thorough instructions covering OEE, FPY, defect rate formulas, all join paths, and column naming. Add 10 curated Q-to-SQL examples. Print the browser URL when done.
+Create a Genie space on catalog `workshop_demo`, schema `genie_workshop_manufacturing`, warehouse `<ID>`. Attach all 7 tables. Use the genie-space-builder skill for the API pattern. Write thorough instructions covering OEE, FPY, defect rate formulas, all join paths, and column naming. Add 10 curated Q-to-SQL examples. Print the browser URL when done.
 ```
 
 ### Bring-your-own-data prompt (generic)

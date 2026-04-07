@@ -1,12 +1,12 @@
 {
-  "run_name": "gm_genie_workshop_02_genie_spaces_serverless",
+  "run_name": "manufacturing_genie_workshop_02_genie_spaces_serverless",
   "timeout_seconds": 3600,
   "tasks": [
     {
       "task_key": "create_genie_spaces",
       "environment_key": "default",
       "notebook_task": {
-        "notebook_path": "/Workspace/Shared/gm-genie-workshop/02_create_genie_spaces",
+        "notebook_path": "/Workspace/Shared/manufacturing-genie-workshop/02_create_genie_spaces",
         "source": "WORKSPACE"
       }
     }

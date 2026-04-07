@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate notebooks 03–09 (workshop steps 3–9) and copy app assets for GM Genie Workshop."""
+"""Generate notebooks 03–09 (workshop steps 3–9) and copy app assets for Manufacturing Genie workshop."""
 import json
 import shutil
 from pathlib import Path
@@ -71,7 +71,7 @@ CELLS_03 = [
     ),
     code(
         '''
-dbutils.widgets.text("catalog", "gm_ama_demos", "Catalog")
+dbutils.widgets.text("catalog", "workshop_demo", "Catalog")
 dbutils.widgets.text("schema", "genie_workshop_manufacturing", "Schema")
 
 CATALOG = dbutils.widgets.get("catalog")
@@ -279,7 +279,7 @@ CELLS_06_COMPARE = [
     md("## Configuration", "", "Load both space IDs from `workshop_config`."),
     code(
         '''
-dbutils.widgets.text("catalog", "gm_ama_demos", "Catalog")
+dbutils.widgets.text("catalog", "workshop_demo", "Catalog")
 dbutils.widgets.text("schema", "genie_workshop_manufacturing", "Schema")
 
 CATALOG = dbutils.widgets.get("catalog")
@@ -556,7 +556,7 @@ import re
 
 from databricks.sdk import WorkspaceClient
 
-dbutils.widgets.text("catalog", "gm_ama_demos", "Catalog")
+dbutils.widgets.text("catalog", "workshop_demo", "Catalog")
 dbutils.widgets.text("schema", "genie_workshop_manufacturing", "Schema")
 CATALOG = dbutils.widgets.get("catalog")
 SCHEMA = dbutils.widgets.get("schema")
@@ -744,7 +744,7 @@ CELLS_05 = [
         "",
         "Install the workshop skill so Code understands OEE, FPY, joins, and naming. Then use Code against your catalog or use the **no-eval** Genie space for SQL-only A/B (notebook **06**).",
         "",
-        "Skill source in repo: `skill/gm-genie-manufacturing-context/SKILL.md`.",
+        "Skill source in repo: `skill/manufacturing-genie-context/SKILL.md`.",
     ),
     md("## Serverless", "", "Use **Serverless**."),
     md(
@@ -759,7 +759,7 @@ import re
 
 from databricks.sdk import WorkspaceClient
 
-dbutils.widgets.text("catalog", "gm_ama_demos", "Catalog")
+dbutils.widgets.text("catalog", "workshop_demo", "Catalog")
 dbutils.widgets.text("schema", "genie_workshop_manufacturing", "Schema")
 CATALOG = dbutils.widgets.get("catalog")
 SCHEMA = dbutils.widgets.get("schema")
@@ -802,18 +802,18 @@ for r in rows:
     md(
         "## Install skills (Genie Code)",
         "",
-        "Copy `skill/gm-genie-manufacturing-context/` into your user or repo **`.assistant/skills`** path (see current Genie Code docs). Skills are **not** stored inside the Genie SQL space JSON.",
+        "Copy `skill/manufacturing-genie-context/` into your user or repo **`.assistant/skills`** path (see current Genie Code docs). Skills are **not** stored inside the Genie SQL space JSON.",
     ),
     md("## Sample `SKILL.md` excerpt", "", "Paste into the skill file or use the bundled copy in the repo."),
     code(
         '''
 skill_md = """
 ---
-name: gm-genie-manufacturing-context
+name: manufacturing-genie-context
 description: Manufacturing quality metrics and joins for Genie Code
 ---
 
-# GM manufacturing context
+# Manufacturing Genie context
 
 - OEE: `quality_metrics_daily.oee_score` is 0 to 1 (multiply by 100 for percent).
 - FPY: `first_pass_yield` same scale.
@@ -846,7 +846,7 @@ CELLS_07_SECURITY = [
     md("## Configuration", "", "Same **catalog** / **schema** widgets as the rest of the workshop."),
     code(
         '''
-dbutils.widgets.text("catalog", "gm_ama_demos", "Catalog")
+dbutils.widgets.text("catalog", "workshop_demo", "Catalog")
 dbutils.widgets.text("schema", "genie_workshop_manufacturing", "Schema")
 CATALOG = dbutils.widgets.get("catalog")
 SCHEMA = dbutils.widgets.get("schema")
@@ -991,7 +991,7 @@ if not warehouse_id:
     print("No SQL warehouse found — create the Genie space manually and attach", f"{fqn}.production_events_restricted")
 else:
     payload = {
-        "display_name": "GM Workshop — Security demo (masked VIN)",
+        "display_name": "Manufacturing workshop — Security demo (masked VIN)",
         "description": "Genie sees only production_events_restricted; unit_serial_vin masked for non-admins",
         "warehouse_id": warehouse_id,
         "table_identifiers": [f"{fqn}.production_events_restricted"],
@@ -1099,7 +1099,7 @@ except Exception as e:
         "| `production_events_restricted` | Same rows, `unit_serial_vin` masked unless admin. |",
         "| Genie on **view only** | Answers match UC — **no bypass** of column masks. |",
         "",
-        "**Cleanup:** Delete the **GM Workshop — Security demo** Genie space in the UI when finished if you do not want an extra space in the workspace.",
+        "**Cleanup:** Delete the **Manufacturing workshop — Security demo** Genie space in the UI when finished if you do not want an extra space in the workspace.",
     ),
 ]
 
@@ -1129,7 +1129,7 @@ import re
 
 from databricks.sdk import WorkspaceClient
 
-dbutils.widgets.text("catalog", "gm_ama_demos", "Catalog")
+dbutils.widgets.text("catalog", "workshop_demo", "Catalog")
 dbutils.widgets.text("schema", "genie_workshop_manufacturing", "Schema")
 CATALOG = dbutils.widgets.get("catalog")
 SCHEMA = dbutils.widgets.get("schema")
@@ -1249,7 +1249,7 @@ print(f"  GENIE_SPACE_ID: '{GENIE_SPACE_ID}'  # use {{secrets/scope/key}} in rea
     ),
     code(
         '''
-# Example job parameter JSON fragment (documentation only):
+# Example job JSON snippet (documentation only):
 job_params_example = {
     "catalog": CATALOG,
     "schema": SCHEMA,
@@ -1271,7 +1271,7 @@ CELLS_09_MON = [
     md("## Configuration"),
     code(
         '''
-dbutils.widgets.text("catalog", "gm_ama_demos", "Catalog")
+dbutils.widgets.text("catalog", "workshop_demo", "Catalog")
 dbutils.widgets.text("schema", "genie_workshop_manufacturing", "Schema")
 CATALOG = dbutils.widgets.get("catalog")
 SCHEMA = dbutils.widgets.get("schema")
@@ -1334,7 +1334,7 @@ def main():
         # Patch app.py for manufacturing
         p = app_dst / "app.py"
         t = p.read_text()
-        t = t.replace("Vizient Supply Chain Analyzer", "GM Manufacturing Genie")
+        t = t.replace("Vizient Supply Chain Analyzer", "Manufacturing Genie")
         t = t.replace(
             "Ask questions about spend, suppliers, contracts, and backorders in plain English.",
             "Ask questions about OEE, quality, production events, and safety in plain English.",
@@ -1343,7 +1343,7 @@ def main():
         y = app_dst / "app.yaml"
         if y.exists():
             y.write_text(
-                y.read_text().replace("vizient-supply-chain", "gm-manufacturing-genie")
+                y.read_text().replace("vizient-supply-chain", "manufacturing-genie")
             )
         print("Copied app from Vizient template")
     else:

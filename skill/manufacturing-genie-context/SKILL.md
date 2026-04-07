@@ -1,13 +1,13 @@
 ---
-name: gm-genie-manufacturing-context
-description: Manufacturing quality (OEE, FPY, defects) and joins for Genie Code on GM Genie workshop tables.
+name: manufacturing-genie-context
+description: Manufacturing quality (OEE, FPY, defects) and joins for Genie Code on this workshop’s Unity Catalog tables.
 ---
 
-# GM manufacturing Genie context
+# Manufacturing Genie context
 
 ## Catalog and schema
 
-Replace `CATALOG.SCHEMA` with your workshop location (defaults: `gm_ama_demos.genie_workshop_manufacturing`).
+Replace `CATALOG.SCHEMA` with your workshop location (defaults: `workshop_demo.genie_workshop_manufacturing`).
 
 ## Genie spaces in this workshop
 

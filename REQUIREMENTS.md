@@ -1,4 +1,4 @@
-# GM Genie Workshop — Requirements
+# Manufacturing Genie workshop — Requirements
 
 **Status:** Draft (planning)  
 **Target hardening:** Battle-test notebooks multiple times before **April 15, 2026**  
@@ -47,7 +47,7 @@ Primary outcomes for participants:
 - **Genie Code + Skills**: manufacturing-themed skills under `skill/`; notebook walkthrough with copy-paste-safe steps.
 - **Security / governance** module: row filters, column masks, or restricted views on plant/line (mirror Manufacturing_Workshop “filtering and masking” intent, adapted to multi-notebook flow).
 - **README** with prerequisites, parameter table, and “run order”.
-- **Git**: initialize repo in `GM-Genie-Workshop/`, push to org-approved shared GitHub (see Open decisions).
+- **Git**: initialize repo in `manufacturing-genie-workshop/`, push to org-approved shared GitHub (see Open decisions).
 
 ### 3.2 Out of scope (initial cut)
 
@@ -107,7 +107,7 @@ Primary outcomes for participants:
 | ID | Requirement |
 |----|-------------|
 | FR-GC-01 | Dedicated notebook section (or standalone notebook) **≥ 15 minutes** of material: install path, invoking Genie Code, loading a skill. |
-| FR-GC-02 | At least **two** skills: e.g. `gm-genie-manufacturing-context` (metric definitions + join graph) and `gm-genie-app-helper` (app/API snippets). |
+| FR-GC-02 | At least **two** skills: e.g. `manufacturing-genie-context` (metric definitions + join graph) and `genie-space-builder` (space API patterns). |
 | FR-GC-03 | Skills use **parameterized catalog.schema** in prose (“replace with your catalog.schema”) — no hardcoded customer names in committed files. |
 
 ### 4.6 App deployment
@@ -160,11 +160,11 @@ Exact split (e.g. monitoring as 08 vs folded into 03/04) is an **open decision**
 ## 7. Open decisions (need owner input before build)
 
 1. **GitHub remote:** Organization, repo name, default branch, and whether repo is **public** or **internal-only**.
-2. **Default catalog/schema names:** e.g. `gm_genie_workshop.manufacturing` vs reuse `main.manufacturing_quality_analytics` for parity with Manufacturing_Workshop clone.
+2. **Default catalog/schema names:** e.g. `workshop_demo.genie_workshop_manufacturing` vs reuse `main.manufacturing_quality_analytics` for parity with Manufacturing_Workshop clone.
 3. **Monitoring implementation:** Which system tables / features are **guaranteed** in the pilot workspace (query history, audit, Genie-specific telemetry)? Plan lists fallbacks.
 4. **Blank vs configured:** Two long-lived spaces vs single space + instruction swap (if API supports update without duplicating spaces).
 5. **Workshop duration:** Half-day (~3h) vs shorter executive demo; drives depth of modules 05 and 08.
-6. **Slides:** Reuse Manufacturing_Workshop / GM deck vs new Google Slides; link from README when available.
+6. **Slides:** Reuse Manufacturing_Workshop deck vs new Google Slides; link from README when available.
 
 ---
 

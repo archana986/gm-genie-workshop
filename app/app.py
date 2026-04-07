@@ -1,5 +1,5 @@
 """
-GM Manufacturing Genie — Databricks App
+Manufacturing Genie — Databricks App
 Powered by Genie Conversation API
 
 Option B: Custom Gradio UI with manufacturing starter questions.
@@ -13,7 +13,7 @@ from databricks.sdk import WorkspaceClient
 
 # --- Configuration ---
 GENIE_SPACE_ID = os.environ.get("GENIE_SPACE_ID", "")
-APP_TITLE = "GM Manufacturing Genie"
+APP_TITLE = "Manufacturing Genie"
 APP_DESCRIPTION = (
     "Ask questions about OEE, quality, production events, and safety in plain English."
 )

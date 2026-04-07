@@ -1,4 +1,4 @@
-"""One-off builder: writes notebooks/02_create_genie_spaces.ipynb (run from GM-Genie-Workshop)."""
+"""One-off builder: writes notebooks/02_create_genie_spaces.ipynb (run from repo root)."""
 import base64
 import json
 from pathlib import Path
@@ -54,16 +54,16 @@ md([
 ])
 
 code("""
-dbutils.widgets.text("catalog", "gm_ama_demos", "Catalog")
+dbutils.widgets.text("catalog", "workshop_demo", "Catalog")
 dbutils.widgets.text("schema", "genie_workshop_manufacturing", "Schema")
 
 CATALOG = dbutils.widgets.get("catalog")
 SCHEMA = dbutils.widgets.get("schema")
 fqn = f"{CATALOG}.{SCHEMA}"
 
-SPACE_TITLE_BLANK = "GM Workshop — Manufacturing (blank context)"
-SPACE_TITLE_CONFIGURED = "GM Workshop — Manufacturing (configured)"
-SPACE_TITLE_CONFIGURED_NO_EX = "GM Workshop — Manufacturing (configured, no example SQL)"
+SPACE_TITLE_BLANK = "Manufacturing workshop — blank context"
+SPACE_TITLE_CONFIGURED = "Manufacturing workshop — configured"
+SPACE_TITLE_CONFIGURED_NO_EX = "Manufacturing workshop — configured, no example SQL"
 SPACE_DESC_BLANK = "Manufacturing tables only. Minimal instructions for A/B comparison."
 SPACE_DESC_CONFIGURED = "Manufacturing quality analytics: OEE, FPY, defects, downtime, safety, equipment feedback."
 SPACE_DESC_CONFIGURED_NO_EX = (

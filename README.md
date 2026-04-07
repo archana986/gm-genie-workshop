@@ -38,7 +38,7 @@ Every notebook asks for the same two **widgets**:
 
 Set them to **your** UC location and use the **same values in every notebook** (01 through 09).
 
-The notebooks ship with **example defaults** (`gm_ama_demos`, `genie_workshop_manufacturing`) so a facilitator can dry-run quickly. **Replace them with your catalog and schema** before customer use.
+The notebooks ship with **example defaults** (`workshop_demo`, `genie_workshop_manufacturing`) so a facilitator can dry-run quickly. **Replace them with your catalog and schema** before customer use.
 
 ## Run order
 

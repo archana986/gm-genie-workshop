@@ -1,4 +1,4 @@
-# GM Genie Workshop — Implementation Plan
+# Manufacturing Genie workshop — Implementation Plan
 
 **Prerequisite reading:** [REQUIREMENTS.md](./REQUIREMENTS.md)  
 **Pedagogy:** Standard Genie workshop arc adapted for manufacturing.  
@@ -38,7 +38,7 @@
 | Step | Deliverable | Notes |
 |------|-------------|--------|
 | C1 | `05_genie_code_skills.ipynb` | Hands-on checklist; manufacturing examples only. |
-| C2 | `skill/gm-genie-manufacturing-context/SKILL.md` + `skill/gm-genie-app-helper/SKILL.md` | Per FR-GC-03: no hardcoded customer catalog in committed text — use placeholders. |
+| C2 | `skill/manufacturing-genie-context/SKILL.md` + `skill/genie-space-builder/SKILL.md` | Per FR-GC-03: no hardcoded customer catalog in committed text — use placeholders. |
 | C3 | `08_monitoring_observability.ipynb` | Query patterns + “if not available” notes; optional export Lakeview JSON for benchmark trends. |
 | C4 | `06_security_governance.ipynb` | Plant/line RLS or masked columns on manufacturing / PII-like fields. |
 | C5 | `08_deployment` + `app/*` | Databricks App sample; env-based space id (see notebook 08 Option B). |
@@ -112,7 +112,7 @@
 ## 5. File layout (target repo)
 
 ```
-GM-Genie-Workshop/
+manufacturing-genie-workshop/
 ├── README.md
 ├── REQUIREMENTS.md
 ├── PLAN.md
@@ -120,17 +120,18 @@ GM-Genie-Workshop/
 ├── notebooks/
 │   ├── 01_setup_data.ipynb
 │   ├── 02_create_genie_spaces.ipynb
-│   ├── 03_genie_benchmarks.ipynb
+│   ├── 03_genie_evals_benchmarks.ipynb
 │   ├── 04_talk_with_data.ipynb
 │   ├── 05_genie_code_skills.ipynb
-│   ├── 06_security_governance.ipynb
-│   ├── 07_deploy_app.ipynb
-│   └── 08_monitoring_observability.ipynb
+│   ├── 06_compare_genie_spaces.ipynb
+│   ├── 07_security_governance.ipynb
+│   ├── 08_deployment_best_practices.ipynb
+│   └── 09_monitoring_observability.ipynb
 ├── templates/
 │   └── manufacturing_genie_configured.json   # or single JSON with blank body variant
 ├── skill/
-│   ├── gm-genie-manufacturing-context/SKILL.md
-│   └── gm-genie-app-helper/SKILL.md
+│   ├── manufacturing-genie-context/SKILL.md
+│   └── genie-space-builder/SKILL.md
 └── app/
     ├── app.py
     ├── app.yaml
