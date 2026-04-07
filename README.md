@@ -8,7 +8,6 @@ Self-contained **Databricks Genie** lab on **sample manufacturing data** (OEE, q
 |----------|---------|
 | **This README** | Workshop overview, what each notebook **accomplishes**, **setup** and **expected outcomes**, and what ships in the package |
 | **[SETUP.md](./SETUP.md)** | Step-by-step environment prep, first-run checklist, **verify embedded Genie template**, troubleshooting |
-| **[CODE_WORKINGS.md](./CODE_WORKINGS.md)** | Technical explanation of what each notebook’s code does (APIs, tables, flows) |
 
 Start with **SETUP.md** before your first full run, then follow the notebook guide below.
 
@@ -40,7 +39,7 @@ Use the **same values in 01–09**. Defaults (`workshop_demo`, `genie_workshop_m
 
 ## Notebook guide (01 → 09)
 
-For environment checks and verification commands, see **[SETUP.md](./SETUP.md)**. For internals, see **[CODE_WORKINGS.md](./CODE_WORKINGS.md)**.
+For environment checks and verification commands, see **[SETUP.md](./SETUP.md)**.
 
 | # | Notebook | What it accomplishes | Setup you need | Expected outcome |
 |---|----------|----------------------|----------------|------------------|

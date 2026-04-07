@@ -38,7 +38,7 @@ Primary outcomes for participants:
 
 ### 3.1 In scope
 
-- Notebooks and assets under this repo following the **module order** in PLAN.md.
+- Notebooks and assets under this repo following the **module order** in [README.md](./README.md).
 - **Unity Catalog** catalog/schema (configurable via Python variables; no `spark.conf.set` for app config per workspace rules).
 - **Synthetic manufacturing dataset** structurally aligned with Manufacturing_Workshop: plants, production_lines, operators, production_events, quality_metrics_daily, safety_incidents, equipment_feedback; SQL helpers where useful (`compute_oee_summary`, defect rate, etc.).
 - **Genie Space** creation via notebook (SDK) with fallback to UI + `workshop_config` persistence.
@@ -153,7 +153,7 @@ Module numbering is stable; additions marked **(new)**.
 | — | `08_monitoring_observability.ipynb` **(new)** | Monitoring patterns + optional dashboards |
 | — | `00_workshop_prereqs.md` **(optional)** | Checklist only (or first markdown in README) |
 
-Exact split (e.g. monitoring as 08 vs folded into 03/04) is an **open decision**; see PLAN.md.
+Exact split (e.g. monitoring as 08 vs folded into 03/04) is an **open decision**; see [README.md](./README.md).
 
 ---
 
@@ -175,12 +175,12 @@ Exact split (e.g. monitoring as 08 vs folded into 03/04) is an **open decision**
 - [ ] Facilitator can run **blank vs configured** comparison in **≤ 10 minutes** live.
 - [ ] Monitoring notebook runs **or** clearly documents blocked APIs with alternative manual checks.
 - [ ] Genie Code notebook completes with **both** skills discoverable from documented paths.
-- [ ] README + REQUIREMENTS + PLAN committed; GitHub push completed per NFR-REL-01.
+- [ ] README + REQUIREMENTS committed; GitHub push completed per NFR-REL-01.
 - [ ] TEST_LOG shows **3+** full dry runs before Apr 15.
 
 ---
 
 ## 9. References (in-repo)
 
-- Internal planning notes: PLAN.md in this folder.
+- Workshop run order and outcomes: [README.md](./README.md), [SETUP.md](./SETUP.md).
 - Data & metric definitions: `../../Manufacturing_Workshop/README.md`, `../../Manufacturing_Workshop/manufacturing_genie_space.json`

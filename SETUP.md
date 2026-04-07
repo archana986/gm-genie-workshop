@@ -7,7 +7,6 @@ Use this file **before and during** the first full run. It covers **environment 
 | Doc | Use it for |
 |-----|------------|
 | [README.md](./README.md) | What the workshop is, what each notebook achieves, outcomes, package contents |
-| [CODE_WORKINGS.md](./CODE_WORKINGS.md) | How the notebooks work technically (APIs, tables, data flow) |
 
 ## 1. Prerequisites
 
