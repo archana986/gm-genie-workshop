@@ -31,7 +31,7 @@ md([
     "Creates **three** Genie spaces on the same manufacturing tables:",
     "",
     "1. **Blank context** — tables only, minimal instructions.",
-    "2. **Configured (with examples)** — full business instructions + **sample questions** and **curated Q→SQL** from `templates/manufacturing_genie_configured.json` (primary: `genie_space_id`).",
+    "2. **Configured (with examples)** — full business instructions + **sample questions** and **curated Q→SQL** from the **embedded** Genie template in this notebook (source in repo: `templates/manufacturing_genie_configured.json`; primary space key: `genie_space_id`).",
     "3. **Configured (no examples)** — **same** business instructions as (2) but **no** sample/curated pairs (`genie_space_id_configured_no_evals`) for A/B in notebook **06**.",
     "",
     "Saves IDs to `workshop_config`. Next: **03_genie_evals_benchmarks**.",
@@ -110,112 +110,36 @@ if not warehouse_id:
 """)
 
 md([
-    "## Load configured Genie JSON",
+    "## Load configured Genie template (embedded only)",
     "",
-    "Load order: **local / Repo paths** → optional **workspace export** (widget path and `/Users/...` alias) → **embedded** copy of `templates/manufacturing_genie_configured.json` (base64 in this notebook so **Jobs always work**). Re-run `scripts/build_02_notebook.py` after editing the template to refresh the embedded copy.",
+    "This notebook **always** loads the Genie space definition from a **built-in base64 copy** so it works after a plain workspace import, in **Jobs**, and without any extra JSON file in the workspace.",
+    "",
+    "**Maintainers:** The canonical JSON in Git is `templates/manufacturing_genie_configured.json`. After editing it, refresh the notebook with:",
+    "",
+    "```bash",
+    "python3 scripts/build_02_notebook.py",
+    "```",
+    "",
+    "Run the next cell and confirm the printed line starts with **`Loaded Genie template from: embedded`**.",
 ])
 
-_LOAD_GENIE_JSON_CELL_PREFIX = '''import base64
+_LOAD_EMBEDDED_ONLY_PREFIX = '''import base64
 import json
-import os
-
-import requests
-from databricks.sdk import WorkspaceClient
-
-dbutils.widgets.text(
-    "genie_json_path",
-    "manufacturing_genie_configured.json",
-    "Local/Repo relative path to manufacturing_genie_configured.json",
-)
-dbutils.widgets.text(
-    "genie_json_workspace_path",
-    "",
-    "Workspace path for export fallback",
-)
 
 _EMBEDDED_B64 = "'''
 
-_LOAD_GENIE_JSON_CELL_SUFFIX = '''"
+_LOAD_EMBEDDED_ONLY_SUFFIX = '''"
 
 
 def _load_embedded():
     return json.loads(base64.b64decode(_EMBEDDED_B64).decode("utf-8"))
 
 
-_wc = WorkspaceClient()
-_host = _wc.config.host.rstrip("/")
-_headers = {**_wc.config.authenticate()}
-
-
-def _load_json_via_export(abs_workspace_path: str):
-    r = requests.get(
-        f"{_host}/api/2.0/workspace/export",
-        headers=_headers,
-        params={"path": abs_workspace_path, "format": "SOURCE"},
-        timeout=60,
-    )
-    if r.status_code != 200:
-        raise RuntimeError(f"export HTTP {r.status_code}: {r.text[:300]}")
-    body = r.json()
-    b64 = body.get("content")
-    if not b64:
-        raise RuntimeError("export response missing content")
-    raw = base64.b64decode(b64)
-    text = raw.decode("utf-8-sig").strip()
-    if not text:
-        raise RuntimeError("export decoded empty body")
-    return json.loads(text)
-
-
-def _try_open_local(p):
-    if not p:
-        return None
-    try:
-        with open(p) as f:
-            return json.load(f)
-    except (OSError, IOError, FileNotFoundError, json.JSONDecodeError):
-        return None
-
-
-path_try = [
-    dbutils.widgets.get("genie_json_path").strip(),
-    "manufacturing_genie_configured.json",
-    "templates/manufacturing_genie_configured.json",
-    "../templates/manufacturing_genie_configured.json",
-]
-
-genie_config = None
-used = None
-for p in path_try:
-    genie_config = _try_open_local(p)
-    if genie_config is not None:
-        used = p
-        break
-
-ws = dbutils.widgets.get("genie_json_workspace_path").strip()
-if genie_config is None and ws:
-    candidates = [ws]
-    if ws.startswith("/Workspace/Users"):
-        candidates.append(ws[len("/Workspace") :])
-    elif ws.startswith("/Users/"):
-        candidates.append("/Workspace" + ws)
-    last_err = None
-    for ap in dict.fromkeys(candidates):
-        try:
-            genie_config = _load_json_via_export(ap)
-            used = ap + " (workspace export)"
-            last_err = None
-            break
-        except Exception as e:
-            last_err = e
-    if genie_config is None and last_err:
-        print("Workspace export failed, using embedded template:", str(last_err)[:200])
-
-if genie_config is None:
-    genie_config = _load_embedded()
-    used = "embedded template (refresh: python3 scripts/build_02_notebook.py)"
-
-print(f"Loaded Genie template from: {used}")
+genie_config = _load_embedded()
+print(
+    "Loaded Genie template from: embedded "
+    "(refresh from templates/: python3 scripts/build_02_notebook.py)"
+)
 
 OLD_FQN = "main.manufacturing_quality_analytics"
 
@@ -233,7 +157,7 @@ def rewrite_fqn(obj):
 genie_config = rewrite_fqn(genie_config)
 '''
 
-code(_LOAD_GENIE_JSON_CELL_PREFIX + _GENIE_TEMPLATE_B64 + _LOAD_GENIE_JSON_CELL_SUFFIX)
+code(_LOAD_EMBEDDED_ONLY_PREFIX + _GENIE_TEMPLATE_B64 + _LOAD_EMBEDDED_ONLY_SUFFIX)
 
 md([
     "## Helpers: build API payload and create space",

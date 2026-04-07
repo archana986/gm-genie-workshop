@@ -48,8 +48,7 @@ PROFILE="$PROFILE" WORKSPACE_PATH="$WORKSPACE_PATH" "$SYNC_SH" \
   "$REPO_ROOT/notebooks/06_compare_genie_spaces.ipynb" \
   "$REPO_ROOT/notebooks/07_security_governance.ipynb" \
   "$REPO_ROOT/notebooks/08_deployment_best_practices.ipynb" \
-  "$REPO_ROOT/notebooks/09_monitoring_observability.ipynb" \
-  "$REPO_ROOT/templates/manufacturing_genie_configured.json"
+  "$REPO_ROOT/notebooks/09_monitoring_observability.ipynb"
 
 # App sources must land under WORKSPACE_PATH/app/ so notebook 08 can export app/app.py, etc.
 echo "== Sync Databricks App bundle (WORKSPACE_PATH=$WORKSPACE_PATH/app) =="

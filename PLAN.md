@@ -114,6 +114,8 @@
 ```
 manufacturing-genie-workshop/
 ├── README.md
+├── SETUP.md
+├── CODE_WORKINGS.md
 ├── REQUIREMENTS.md
 ├── PLAN.md
 ├── TEST_LOG.md                 # created during QA

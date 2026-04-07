@@ -1,69 +1,66 @@
 # Manufacturing Genie — hands-on workshop
 
-Self-contained **Databricks Genie** lab using **sample manufacturing data** (OEE, quality, downtime, safety). You run the notebooks **in your own workspace** on **your** Unity Catalog **catalog** and **schema**.
+Self-contained **Databricks Genie** lab on **sample manufacturing data** (OEE, quality, downtime, safety). Participants run notebooks **in order** in **their** workspace using **their** Unity Catalog **catalog** and **schema**.
+
+## How to use this documentation
+
+| Document | Purpose |
+|----------|---------|
+| **This README** | Workshop overview, what each notebook **accomplishes**, **setup** and **expected outcomes**, and what ships in the package |
+| **[SETUP.md](./SETUP.md)** | Step-by-step environment prep, first-run checklist, **verify embedded Genie template**, troubleshooting |
+| **[CODE_WORKINGS.md](./CODE_WORKINGS.md)** | Technical explanation of what each notebook’s code does (APIs, tables, flows) |
+
+Start with **SETUP.md** before your first full run, then follow the notebook guide below.
 
 ## What you receive
 
-Unzip the package and import the notebooks into Databricks (for example: **Workspace** upload, **Repos**, or **Asset bundles**). Typical contents:
-
 | Folder / files | Role |
 |----------------|------|
-| `notebooks/01` … `09` | Run in order (see below). |
-| `templates/manufacturing_genie_configured.json` | **Optional.** Used by **02** if you place it where the notebook can read it. If it is missing, **02** uses a **built-in copy** of the same template. |
-| `app/` | **Optional.** Only if you complete **08** “Databricks App” — copy `app/` next to your notebooks in the workspace (see **08**). |
-| `skill/` | **Optional.** For **05** (Genie Code) — follow the instructions inside **05** to attach the skill. |
+| `notebooks/01_setup_data.ipynb` … `09_monitoring_observability.ipynb` | **Required.** Run in order (see notebook guide below). |
+| `templates/manufacturing_genie_configured.json` | **Maintainers only** — source for Genie instructions embedded in **02**. Learners do **not** upload this; **02** uses the built-in copy. After edits, run `python3 scripts/build_02_notebook.py` and `python3 scripts/verify_02_embedded_template.py`. |
+| `app/` | **Optional** — notebook **08** (Databricks App). |
+| `skill/` | **Optional** — notebook **05** (Genie Code skills). |
 
-You do **not** need any external sync scripts or job JSON files to complete the workshop interactively.
+You do **not** need external sync scripts or job JSON to complete the workshop interactively.
 
-### Folder layout (so everything works end-to-end)
+### Package layout
 
-Customers run notebooks **one after another** in **their** workspace. The workshop is designed for that flow.
+Keep `notebooks/` together when you use Repos or zip import. Optional `app/` and `skill/` sit beside `notebooks/` if you use those modules.
 
-- **Minimum to complete the core path (01 → 09):** the nine notebooks under `notebooks/`. Notebook **02** still works without any JSON on disk because it carries an **embedded** copy of the Genie template.
-- **Recommended zip layout:** keep the same structure as this repo — `notebooks/` next to optional `templates/`, `app/`, `skill/`. That way **02** can optionally read `templates/manufacturing_genie_configured.json` from the driver when you use **Databricks Repos** or an uploaded folder tree.
-- **Avoid:** importing only loose `.ipynb` files into a random workspace folder with **no** `templates/` sibling, if you expected file-based template loading; use the embedded path (leave workspace JSON widget empty) or upload the JSON and set the workspace-path widget.
+## Global settings (all notebooks)
 
-## Before you run anything
-
-- **Databricks** workspace with **Unity Catalog**, **Genie**, and **Serverless** (or UC-enabled) notebook compute.
-- Permission to **create a schema** and **write tables** in a catalog you choose (or use an existing empty schema).
-- A **SQL warehouse** available (Genie uses it); the notebooks pick one where possible.
-
-## One setting for the whole workshop
-
-Every notebook asks for the same two **widgets**:
+Every notebook uses the same two **widgets**:
 
 - **Catalog**
 - **Schema**
 
-Set them to **your** UC location and use the **same values in every notebook** (01 through 09).
+Use the **same values in 01–09**. Defaults (`workshop_demo`, `genie_workshop_manufacturing`) are for facilitator dry-runs—replace with your UC location for production workshops.
 
-The notebooks ship with **example defaults** (`workshop_demo`, `genie_workshop_manufacturing`) so a facilitator can dry-run quickly. **Replace them with your catalog and schema** before customer use.
+**Compute:** Prefer **Serverless**. Catalog/schema are widgets only (not `spark.conf.set` for workshop settings).
 
-## Run order
+## Notebook guide (01 → 09)
 
-| Step | Notebook | What it does |
-|------|----------|----------------|
-| 1 | `01_setup_data` | Creates tables and sample data; adds helper functions and comments Genie can use. |
-| 2 | `02_create_genie_spaces` | Creates three Genie spaces and saves their IDs in a config table `workshop_config`. |
-| 3 | `03_genie_evals_benchmarks` | Defines benchmarks and attaches them to your main Genie space. |
-| 4 | `04_talk_with_data` | Opens Genie in the browser; optional “reference SQL” to compare answers. |
-| 5 | `05_genie_code_skills` | Genie Code and optional skills; links to your spaces. |
-| 6 | `06_compare_genie_spaces` | Compares benchmark results with vs without in-space examples. |
-| 7 | `07_security_governance` | Unity Catalog masking / restricted view; Genie on the view only. |
-| 8 | `08_deployment_best_practices` | Playground, optional App bundle, Jobs pattern, optional CI/CD demo. |
-| 9 | `09_monitoring_observability` | Monitoring links, benchmark history, optional audit / query-history SQL. |
+For environment checks and verification commands, see **[SETUP.md](./SETUP.md)**. For internals, see **[CODE_WORKINGS.md](./CODE_WORKINGS.md)**.
 
-Run **01 → 09** at least once in that order the first time through.
+| # | Notebook | What it accomplishes | Setup you need | Expected outcome |
+|---|----------|----------------------|----------------|------------------|
+| 01 | `01_setup_data` | Creates all manufacturing Delta tables, synthetic data, SQL helpers, and Genie-friendly comments. | UC catalog (exists or creatable), **CREATE SCHEMA** permission, Serverless/UC cluster. After `%pip`, re-run the post-restart config cell. | Tables and functions exist under your catalog.schema; notebook prints row counts / sanity checks. |
+| 02 | `02_create_genie_spaces` | Creates **three** Genie spaces (blank, configured with examples, configured without examples) and saves ids to `workshop_config`. | **01** completed. SQL warehouse available. | Output includes **`Loaded Genie template from: embedded`**; three clickable Genie URLs; Delta table `{catalog}.{schema}.workshop_config` with keys such as `genie_space_id`, `genie_space_id_blank`, `genie_space_id_configured_no_evals`. |
+| 03 | `03_genie_evals_benchmarks` | Defines evaluation benchmarks and attaches them to the primary Genie space. | **02** completed; primary space id in `workshop_config`. | Benchmark definitions stored; Genie eval integration ready for runs in **03** / **06**. |
+| 04 | `04_talk_with_data` | Guided exploration in Genie UI; optional reference SQL. | **02**–**03** done; browser access to workspace. | You can open Genie from printed links and run sample questions. |
+| 05 | `05_genie_code_skills` | Genie Code walkthrough; optional installation of skills from `skill/`. | **02** done; Genie Code enabled in workspace. | Skills path documented; exercises completed per notebook cells. |
+| 06 | `06_compare_genie_spaces` | Compares benchmark behavior with vs without in-space examples. | **02**–**03** done; multiple space ids in `workshop_config`. | Side-by-side or sequential comparison results visible (pass rates or qualitative). |
+| 07 | `07_security_governance` | UC masking / restricted view; Genie reads restricted data appropriately. | **01**–**02** done; adjust **`admin_group`** (or equivalent) to a real group. | View or mask in place; demo Genie space or instructions point at restricted objects. |
+| 08 | `08_deployment_best_practices` | Playground, optional App, Jobs pattern, optional CI/CD notes. | **02** done; for App, `app/` files reachable from workspace. | Links work; optional App deploy path understood; reference job JSON named in notebook if used. |
+| 09 | `09_monitoring_observability` | Monitoring links, benchmark history, optional system-table SQL. | Earlier notebooks run; **system** table access may be limited. | Printed links and/or SQL run or fail gracefully with documented fallbacks. |
 
-## Notebook details worth knowing
+## Quick reminders
 
-- **Compute:** Use **Serverless** when prompted. Catalog and schema are set with **widgets** only (not `spark.conf.set` for workshop settings).
-- **01:** After `%pip`, Python restarts — use the notebook’s “re-set config” cell, same catalog/schema.
-- **02 — Genie template widgets:** The notebook loads `manufacturing_genie_configured.json` in this order: (1) **local paths** on the driver (default filename and `templates/…`—good for Repos or a zip layout), (2) **workspace file** only if you set the **workspace path** widget to a full `/Workspace/...` path, (3) **embedded copy** so it always works. **Leave the workspace-path widget empty** unless you uploaded the JSON yourself; see the **“Genie template file”** section at the top of **02** for full instructions. After the load cell runs, read **Loaded Genie template from:** in the output.
-- **07:** The demo uses a group name `admin_group` in SQL — rename it to match **your** workspace group, or adjust the view logic.
-- **08 — App:** If you use the App option, keep `app.py`, `app.yaml`, and `requirements.txt` together in a folder (for example `…/app/`) as **08** describes.
-- **09:** Queries on `system.access.audit` and `system.query.history` need **appropriate grants**; cells catch errors if you do not have access.
+- **01:** After `%pip`, Python restarts—use the notebook’s **re-set config** cell.
+- **02:** Template is **embedded only**; success line must show **`Loaded Genie template from: embedded`**.
+- **07:** Rename `admin_group` to match your workspace.
+- **08:** Keep `app.py`, `app.yaml`, and `requirements.txt` together if you deploy the sample App.
+- **09:** `system.access.audit` / `system.query.history` may require extra grants.
 
 ## License and data
 
