@@ -1,0 +1,22 @@
+{
+  "run_name": "gm_genie_workshop_02_genie_spaces_serverless",
+  "timeout_seconds": 3600,
+  "tasks": [
+    {
+      "task_key": "create_genie_spaces",
+      "environment_key": "default",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/archana.krishnamurthy@databricks.com/GM-Genie-Workshop/02_create_genie_spaces",
+        "source": "WORKSPACE"
+      }
+    }
+  ],
+  "environments": [
+    {
+      "environment_key": "default",
+      "spec": {
+        "client": "1"
+      }
+    }
+  ]
+}

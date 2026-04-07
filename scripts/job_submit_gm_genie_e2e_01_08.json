@@ -1,0 +1,128 @@
+{
+  "run_name": "gm_genie_workshop_e2e_01_through_09_serverless",
+  "timeout_seconds": 14400,
+  "tasks": [
+    {
+      "task_key": "t01_setup",
+      "environment_key": "default",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/archana.krishnamurthy@databricks.com/GM-Genie-Workshop/01_setup_data",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog": "gm_ama_demos",
+          "schema": "genie_workshop_manufacturing"
+        }
+      }
+    },
+    {
+      "task_key": "t02_genie",
+      "environment_key": "default",
+      "depends_on": [{ "task_key": "t01_setup" }],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/archana.krishnamurthy@databricks.com/GM-Genie-Workshop/02_create_genie_spaces",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog": "gm_ama_demos",
+          "schema": "genie_workshop_manufacturing"
+        }
+      }
+    },
+    {
+      "task_key": "t03_evals",
+      "environment_key": "default",
+      "depends_on": [{ "task_key": "t02_genie" }],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/archana.krishnamurthy@databricks.com/GM-Genie-Workshop/03_genie_evals_benchmarks",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog": "gm_ama_demos",
+          "schema": "genie_workshop_manufacturing"
+        }
+      }
+    },
+    {
+      "task_key": "t04_talk",
+      "environment_key": "default",
+      "depends_on": [{ "task_key": "t03_evals" }],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/archana.krishnamurthy@databricks.com/GM-Genie-Workshop/04_talk_with_data",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog": "gm_ama_demos",
+          "schema": "genie_workshop_manufacturing"
+        }
+      }
+    },
+    {
+      "task_key": "t05_skills",
+      "environment_key": "default",
+      "depends_on": [{ "task_key": "t04_talk" }],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/archana.krishnamurthy@databricks.com/GM-Genie-Workshop/05_genie_code_skills",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog": "gm_ama_demos",
+          "schema": "genie_workshop_manufacturing"
+        }
+      }
+    },
+    {
+      "task_key": "t06_compare",
+      "environment_key": "default",
+      "depends_on": [{ "task_key": "t05_skills" }],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/archana.krishnamurthy@databricks.com/GM-Genie-Workshop/06_compare_genie_spaces",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog": "gm_ama_demos",
+          "schema": "genie_workshop_manufacturing"
+        }
+      }
+    },
+    {
+      "task_key": "t07_security",
+      "environment_key": "default",
+      "depends_on": [{ "task_key": "t06_compare" }],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/archana.krishnamurthy@databricks.com/GM-Genie-Workshop/07_security_governance",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog": "gm_ama_demos",
+          "schema": "genie_workshop_manufacturing"
+        }
+      }
+    },
+    {
+      "task_key": "t08_deploy",
+      "environment_key": "default",
+      "depends_on": [{ "task_key": "t07_security" }],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/archana.krishnamurthy@databricks.com/GM-Genie-Workshop/08_deployment_best_practices",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog": "gm_ama_demos",
+          "schema": "genie_workshop_manufacturing"
+        }
+      }
+    },
+    {
+      "task_key": "t09_monitoring",
+      "environment_key": "default",
+      "depends_on": [{ "task_key": "t08_deploy" }],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/archana.krishnamurthy@databricks.com/GM-Genie-Workshop/09_monitoring_observability",
+        "source": "WORKSPACE",
+        "base_parameters": {
+          "catalog": "gm_ama_demos",
+          "schema": "genie_workshop_manufacturing"
+        }
+      }
+    }
+  ],
+  "environments": [
+    {
+      "environment_key": "default",
+      "spec": { "client": "1" }
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+command:
+  - python
+  - app.py
+
+env:
+  - name: GENIE_SPACE_ID
+    value: ""  # Set after creating the Genie Space
+
+resources:
+  - name: sql-warehouse
+    sql_warehouse:
+      permission: CAN_USE

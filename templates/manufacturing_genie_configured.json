@@ -1,0 +1,61 @@
+{
+  "title": "Manufacturing Quality Analytics",
+  "description": "Explore automotive manufacturing data including production events, quality metrics, defect tracking, and plant performance using natural language.",
+  "table_identifiers": [
+    "main.manufacturing_quality_analytics.production_lines",
+    "main.manufacturing_quality_analytics.operators",
+    "main.manufacturing_quality_analytics.production_events",
+    "main.manufacturing_quality_analytics.plants",
+    "main.manufacturing_quality_analytics.quality_metrics_daily",
+    "main.manufacturing_quality_analytics.safety_incidents",
+    "main.manufacturing_quality_analytics.equipment_feedback"
+  ],
+  "sql_instructions": "Business Context:\nThis dataset represents production and quality data from an automotive manufacturing operation with multiple plants, production lines, and shifts. Use the tables in the main.manufacturing_quality_analytics schema to answer questions about production volume, quality performance, defect tracking, equipment effectiveness, and safety.\n\nKey Metrics & Thresholds:\n- OEE (Overall Equipment Effectiveness): Target >= 85%, Good >= 75%, Poor < 65%. Stored in quality_metrics_daily.oee_score (0 to 1 scale, multiply by 100 for percentage).\n- First Pass Yield: Target >= 95%, Acceptable >= 90%, Poor < 85%. Stored in quality_metrics_daily.first_pass_yield (0 to 1 scale, multiply by 100 for percentage).\n- Defect Rate: Low < 2%, Medium 2-5%, High > 5%. Calculated as (number of defect_detected events / number of unit_produced events) * 100.\n- Downtime: Acceptable < 30 min/day, Concerning 30-60 min/day, Critical > 60 min/day. Stored in quality_metrics_daily.downtime_minutes.\n- Scrap Rate: Target < 1%, Acceptable < 3%, High > 3%. Calculated as (number of scrap events / number of unit_produced events) * 100.\n\nBusiness Classifications:\n- HIGH_PERFORMING_LINE: A production line where OEE >= 0.85 AND First Pass Yield >= 0.95.\n- AT_RISK_LINE: A production line where OEE < 0.70 OR defect_rate > 5%.\n- MAINTENANCE_PRIORITY: A production line where downtime_minutes > 60 OR there are safety incidents > 0.\n\nDefect Code Mapping:\n- DEF-WELD-*: Welding defects (e.g., incomplete welds, weld spatter, weld porosity).\n- DEF-PAINT-*: Paint and coating defects (e.g., orange peel, runs, color mismatch).\n- DEF-FIT-*: Fit and finish defects (e.g., panel gaps, alignment issues, trim fitment).\n- DEF-ELEC-*: Electrical system defects (e.g., wiring faults, sensor failures, module errors).\n- DEF-STMP-*: Stamping defects (e.g., cracks, wrinkles, dimensional variance).\n\nShift Definitions (from operators.shift column):\n- Morning shift: 6:00 AM - 2:00 PM.\n- Afternoon shift: 2:00 PM - 10:00 PM.\n- Night shift: 10:00 PM - 6:00 AM.\n\nKey Formulas:\n- Defect Rate = (COUNT of production_events WHERE event_type = 'defect_detected') / (COUNT of production_events WHERE event_type = 'unit_produced') * 100.\n- Scrap Rate = (COUNT of production_events WHERE event_type = 'scrap') / (COUNT of production_events WHERE event_type = 'unit_produced') * 100.\n- Rework Rate = (COUNT of production_events WHERE event_type = 'rework_completed') / (COUNT of production_events WHERE event_type = 'defect_detected') * 100.\n\nTable Relationships:\n- production_events.production_line_id joins to production_lines.line_id.\n- production_events.operator_id joins to operators.operator_id.\n- production_lines.plant_id joins to plants.plant_id.\n- quality_metrics_daily.production_line_id joins to production_lines.line_id.\n- quality_metrics_daily.plant_id joins to plants.plant_id.\n- safety_incidents.production_line_id joins to production_lines.line_id.\n- equipment_feedback.production_line_id joins to production_lines.line_id.\n- equipment_feedback.operator_id joins to operators.operator_id.\n\nColumn Names:\n- quality_metrics_daily uses 'date' (not metric_date) for the date column.\n- production_events uses 'production_line_id' (not line_id) to reference the production line.\n- quality_metrics_daily uses 'production_line_id' (not line_id) to reference the production line.\n- safety_incidents uses 'production_line_id' (not line_id) to reference the production line.\n- equipment_feedback uses 'production_line_id' (not line_id) to reference the production line.\n- operators has first_name and last_name (concatenate as first_name || ' ' || last_name for full name).\n- production_events does NOT have product_type; join through production_lines to get product_type.\n- production_events.unit_serial_vin is a 17-character unit traceability identifier (VIN-style; treat as sensitive PII for demos—broad Genie audiences should use a restricted view that masks it).\n\nWhen calculating rates, always filter by the appropriate event_type in production_events. When grouping by plant, join through production_lines to plants. Always use fully qualified table names with the main.manufacturing_quality_analytics schema prefix.",
+  "sample_questions": [
+    "Which production lines had the highest defect rates in Q1 2024?",
+    "What is the average OEE by plant for the last 6 months?",
+    "Show me the trend of first pass yield across all EV production lines"
+  ],
+  "curated_questions": [
+    {
+      "question": "How many production events occurred in 2024?",
+      "sql": "SELECT COUNT(*) AS total_production_events FROM main.manufacturing_quality_analytics.production_events WHERE YEAR(event_date) = 2024"
+    },
+    {
+      "question": "Which production lines have defect rates above 5%?",
+      "sql": "SELECT pl.line_id, pl.line_name, ROUND(SUM(CASE WHEN pe.event_type = 'defect_detected' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN pe.event_type = 'unit_produced' THEN 1 ELSE 0 END), 0), 2) AS defect_rate_pct FROM main.manufacturing_quality_analytics.production_events pe JOIN main.manufacturing_quality_analytics.production_lines pl ON pe.production_line_id = pl.line_id GROUP BY pl.line_id, pl.line_name HAVING defect_rate_pct > 5 ORDER BY defect_rate_pct DESC"
+    },
+    {
+      "question": "What is the average OEE by plant?",
+      "sql": "SELECT p.plant_id, p.plant_name, ROUND(AVG(qm.oee_score) * 100, 2) AS avg_oee FROM main.manufacturing_quality_analytics.quality_metrics_daily qm JOIN main.manufacturing_quality_analytics.production_lines pl ON qm.production_line_id = pl.line_id JOIN main.manufacturing_quality_analytics.plants p ON pl.plant_id = p.plant_id GROUP BY p.plant_id, p.plant_name ORDER BY avg_oee DESC"
+    },
+    {
+      "question": "Show first pass yield trend by month",
+      "sql": "SELECT DATE_TRUNC('month', date) AS month, ROUND(AVG(first_pass_yield) * 100, 2) AS avg_first_pass_yield FROM main.manufacturing_quality_analytics.quality_metrics_daily GROUP BY DATE_TRUNC('month', date) ORDER BY month"
+    },
+    {
+      "question": "Which operators detected the most defects?",
+      "sql": "SELECT o.operator_id, o.first_name || ' ' || o.last_name AS operator_name, COUNT(*) AS defects_detected FROM main.manufacturing_quality_analytics.production_events pe JOIN main.manufacturing_quality_analytics.operators o ON pe.operator_id = o.operator_id WHERE pe.event_type = 'defect_detected' GROUP BY o.operator_id, o.first_name, o.last_name ORDER BY defects_detected DESC LIMIT 20"
+    },
+    {
+      "question": "What are the top defect codes?",
+      "sql": "SELECT defect_code, COUNT(*) AS defect_count FROM main.manufacturing_quality_analytics.production_events WHERE defect_code IS NOT NULL GROUP BY defect_code ORDER BY defect_count DESC LIMIT 20"
+    },
+    {
+      "question": "Compare downtime across plants",
+      "sql": "SELECT p.plant_id, p.plant_name, ROUND(SUM(qm.downtime_minutes), 2) AS total_downtime_minutes, ROUND(AVG(qm.downtime_minutes), 2) AS avg_daily_downtime_minutes FROM main.manufacturing_quality_analytics.quality_metrics_daily qm JOIN main.manufacturing_quality_analytics.production_lines pl ON qm.production_line_id = pl.line_id JOIN main.manufacturing_quality_analytics.plants p ON pl.plant_id = p.plant_id GROUP BY p.plant_id, p.plant_name ORDER BY total_downtime_minutes DESC"
+    },
+    {
+      "question": "Which shift has the best quality?",
+      "sql": "SELECT o.shift, ROUND(SUM(CASE WHEN pe.event_type = 'defect_detected' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN pe.event_type = 'unit_produced' THEN 1 ELSE 0 END), 0), 2) AS defect_rate_pct FROM main.manufacturing_quality_analytics.production_events pe JOIN main.manufacturing_quality_analytics.operators o ON pe.operator_id = o.operator_id GROUP BY o.shift ORDER BY defect_rate_pct ASC"
+    },
+    {
+      "question": "List all critical safety incidents",
+      "sql": "SELECT incident_id, incident_date, production_line_id, description, root_cause, corrective_action FROM main.manufacturing_quality_analytics.safety_incidents WHERE severity = 'Critical' ORDER BY incident_date DESC"
+    },
+    {
+      "question": "What is the scrap rate by product type?",
+      "sql": "SELECT pl.product_type, ROUND(SUM(CASE WHEN pe.event_type = 'scrap' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN pe.event_type = 'unit_produced' THEN 1 ELSE 0 END), 0), 2) AS scrap_rate_pct FROM main.manufacturing_quality_analytics.production_events pe JOIN main.manufacturing_quality_analytics.production_lines pl ON pe.production_line_id = pl.line_id GROUP BY pl.product_type ORDER BY scrap_rate_pct DESC"
+    }
+  ]
+}
