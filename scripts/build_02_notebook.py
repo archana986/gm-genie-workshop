@@ -129,7 +129,7 @@ dbutils.widgets.text(
 )
 dbutils.widgets.text(
     "genie_json_workspace_path",
-    "/Workspace/Users/archana.krishnamurthy@databricks.com/GM-Genie-Workshop/manufacturing_genie_configured.json",
+    "",
     "Workspace path for export fallback",
 )
 

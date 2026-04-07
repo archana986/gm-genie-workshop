@@ -6,7 +6,7 @@
       "task_key": "setup_data",
       "environment_key": "default",
       "notebook_task": {
-        "notebook_path": "/Workspace/Users/archana.krishnamurthy@databricks.com/GM-Genie-Workshop/01_setup_data",
+        "notebook_path": "/Workspace/Shared/gm-genie-workshop/01_setup_data",
         "source": "WORKSPACE"
       }
     },
@@ -15,7 +15,7 @@
       "environment_key": "default",
       "depends_on": [{ "task_key": "setup_data" }],
       "notebook_task": {
-        "notebook_path": "/Workspace/Users/archana.krishnamurthy@databricks.com/GM-Genie-Workshop/02_create_genie_spaces",
+        "notebook_path": "/Workspace/Shared/gm-genie-workshop/02_create_genie_spaces",
         "source": "WORKSPACE"
       }
     }

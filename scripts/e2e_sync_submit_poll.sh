@@ -17,8 +17,9 @@ CURSOR_ROOT="${CURSOR_ROOT:-$(cd "$GM_ROOT/../.." && pwd)}"
 SYNC_SH="${CURSOR_ROOT}/Customer-Work/AMA-GM/sync_workspace_artifacts.sh"
 JOB_JSON="${GM_ROOT}/scripts/job_submit_gm_genie_e2e_01_09.json"
 
-PROFILE="${PROFILE:-azure-aiquery}"
-WORKSPACE_PATH="${WORKSPACE_PATH:-/Workspace/Users/archana.krishnamurthy@databricks.com/GM-Genie-Workshop}"
+# Override PROFILE and WORKSPACE_PATH for your workspace (not used for zip-only customer runs).
+PROFILE="${PROFILE:-DEFAULT}"
+WORKSPACE_PATH="${WORKSPACE_PATH:-/Workspace/Shared/gm-genie-workshop}"
 POLL_SECS="${POLL_SECS:-90}"
 MAX_ITERS="${MAX_ITERS:-200}"
 
