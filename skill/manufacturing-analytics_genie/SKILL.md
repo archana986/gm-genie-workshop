@@ -301,13 +301,22 @@ The `serialized_space` field is a **JSON string** (not a nested object) passed i
   },
   "instructions": {
     "text_instructions": [
-      {"content": ["Your SQL instructions text here..."]}
+      {"id": "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5", "content": ["Line 1 of instructions", "Line 2..."]}
     ],
     "example_question_sqls": [
       {
         "id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
         "question": ["What is the defect rate by line?"],
         "sql": ["SELECT line_id, COUNT(CASE WHEN event_type = 'defect_detected' THEN 1 END) ..."]
+      }
+    ]
+  },
+  "benchmarks": {
+    "questions": [
+      {
+        "id": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6",
+        "question": ["How many defects in 2024?"],
+        "answer": [{"format": "SQL", "content": ["SELECT COUNT(*) FROM ..."]}]
       }
     ]
   }
@@ -318,16 +327,40 @@ The `serialized_space` field is a **JSON string** (not a nested object) passed i
 - All `id` values must be **32-character lowercase hex** strings: `uuid.uuid4().hex`
 - `example_question_sqls` must be **sorted by `id`** — unsorted arrays cause `INVALID_PARAMETER_VALUE`
 - `question` and `sql` are **arrays of strings**, not plain strings
-- `content` in `text_instructions` is also an **array of strings**
+- `content` in `text_instructions` is an **array of strings** (each line/paragraph is a separate element)
+- `text_instructions` items also have an `id` field — preserve the existing one when updating
+- `benchmarks.questions` entries have `id`, `question` (array), and `answer` (array of `{"format": "SQL", "content": ["sql"]}`)
+- `version: 2` must always be set explicitly
 - Flat fields like `sql_instructions` or `curated_questions` at the top level of the POST body are **not recognized** — everything goes inside `serialized_space`
 
-### `serialized_space` is Write-Only
+### Reading `serialized_space` (GET with `include_serialized_space`)
 
-`GET /api/2.0/genie/spaces/{id}` returns space metadata (title, description, warehouse_id, table_identifiers) but does **not** return the `serialized_space` field. This means:
+By default, `GET /api/2.0/genie/spaces/{id}` returns only space metadata (title, description, warehouse_id). To read the full configuration, add the query parameter `include_serialized_space=true`:
 
-- You **cannot** read a space's current config, modify it, and PUT it back
-- To update instructions or curated examples, **rebuild the full `serialized_space` from your template** (source of truth) and PATCH it
-- Keep your template JSON file as the single source of truth for space configuration
+```python
+space = requests.get(
+    f"{host}/api/2.0/genie/spaces/{space_id}",
+    headers=headers,
+    params={"include_serialized_space": "true"},
+).json()
+config = json.loads(space["serialized_space"])
+```
+
+This returns the complete blob: `version`, `instructions` (text_instructions, example_question_sqls), `data_sources`, `config` (sample_questions), and `benchmarks` (questions).
+
+### Updating `serialized_space` (GET-merge-PATCH)
+
+`PATCH /api/2.0/genie/spaces/{id}` with `serialized_space` does a **full replace** of the blob. To update only one section (e.g., instructions) without wiping everything else, always use the read-modify-write pattern:
+
+1. **GET** with `include_serialized_space=true`
+2. **Modify** the specific section in the parsed JSON
+3. Set `config["version"] = 2` explicitly
+4. **PATCH** with `json.dumps(config)`
+
+Important rules for the modify step:
+- `text_instructions` is limited to **1 item** (the Genie Workbench truncates to the first)
+- Each `text_instructions` item has `id` (32-char hex) and `content` (list of strings) — preserve the existing `id`
+- Keep your template JSON file as the single source of truth for initial space creation
 
 ### Dedup / Idempotency
 
