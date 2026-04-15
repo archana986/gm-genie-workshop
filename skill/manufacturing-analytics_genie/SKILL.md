@@ -12,14 +12,14 @@ description: Manufacturing quality domain knowledge + Genie space best practices
 - **OEE (Overall Equipment Effectiveness):** Measures productive time vs total available time. Typically stored as a 0-1 decimal — multiply by 100 for percent. Industry benchmarks: 85%+ world-class, 75%+ acceptable, <60% needs attention.
 - **First Pass Yield (FPY):** Percentage of units passing quality inspection on the first attempt without rework. Same 0-1 scale as OEE.
 - **Defect Rate:** Number of defect events divided by number of units produced, expressed as a percentage. Usually calculated per production line over a time window. Formula: `COUNT(defect_detected) / COUNT(unit_produced) * 100`.
-- **Scrap Rate:** Scrapped units divided by total units produced as a percentage. Scrap is waste — defects that cannot be reworked. Formula: `scrap_count / units_produced * 100`.
+- **Scrap Rate:** Scrapped units divided by total units produced as a percentage. Scrap is waste — defects that cannot be reworked. Formula: `scrap_count / units_produced * 100`. **Important:** Scrap rate is a ratio, not a count. When someone asks "what is the scrap rate," compute the ratio from `quality_metrics_daily`, not a count of scrap events.
 - **Downtime:** Minutes or hours a production line is not running. Tracked daily per line. High downtime = lost capacity. Convert to hours: `downtime_minutes / 60`.
 - **Mean Time Between Failures (MTBF):** Average operating time between equipment breakdowns.
 
 ### Typical Manufacturing Data Model
 
 - **Plants/Sites** — One row per manufacturing facility. Key columns: plant ID, name, city, state, employee count, annual revenue.
-- **Production Lines** — One row per line. Types: assembly, paint, stamping, EV battery, powertrain. Each line belongs to a plant. Status can be Active or Maintenance.
+- **Production Lines** — One row per line. Types: assembly, paint, stamping, EV battery, powertrain. Each line belongs to a plant. Status can be Active or Maintenance. **Important:** `status` is a current snapshot attribute, NOT time-varying. Do NOT filter `production_lines.status` by date — it reflects the line's current state regardless of when you query.
 - **Operators** — One row per shop-floor worker. Shift (Morning/Afternoon/Night), certification type, home plant.
 - **Production Events** — Event-level grain. Each row is one event: unit_produced, defect_detected, inspection_passed, downtime_start, scrap, rework_completed. Linked to a production line and operator.
 - **Quality Metrics (Daily)** — One row per line per day. Rolled-up metrics: OEE score, first pass yield, downtime minutes, defects found, scrap count, units produced.
@@ -68,9 +68,10 @@ The distribution is weighted — `unit_produced` is the most common (~40%), foll
 3. Monthly defect rate trend
 
 **Shift-Based Analysis:**
-1. Join events to operators to get shift
+1. Join `production_events` to `operators` by `operator_id` to get the `shift` column — operators have the shift, events do not
 2. Aggregate defects or production counts by shift
 3. Compare shift performance for quality and throughput
+4. For "best quality" shift: count defect_detected events per shift and find the MIN (fewest defects = best quality)
 
 **Safety Analysis:**
 1. Incident count by severity
@@ -141,17 +142,46 @@ These are question + SQL pairs that teach Genie the correct query patterns. They
 - [ ] Subquery with HAVING
 - [ ] MIN/MAX with GROUP BY
 
-### 4. Benchmarks / Evaluation Questions (12-16)
+### 4. Benchmarks / Evaluation Questions (8-12)
 
 These are questions with known ground truth answers used to score Genie's accuracy automatically.
 
-**Best practices:**
+**Two different APIs — do NOT confuse them:**
+
+| What | API | Where it appears in UI |
+|------|-----|----------------------|
+| **Benchmarks** (scoring questions) | `POST /api/2.0/data-rooms/{id}/curated-questions` with `question_type: BENCHMARK` | **Benchmark tab** |
+| **Curated SQL examples** (teaching pairs) | `PATCH /api/2.0/genie/spaces/{id}` with `serialized_space.instructions.example_question_sqls` | **SQL Queries & functions panel** |
+
+Using the wrong API puts content in the wrong panel. Benchmarks pushed via `serialized_space` appear as SQL examples (wrong). SQL examples pushed via `data-rooms` appear as benchmarks (wrong).
+
+**Benchmark API pattern:**
+```python
+# Push benchmarks
+requests.post(f"{host}/api/2.0/data-rooms/{space_id}/curated-questions",
+    headers=headers,
+    json={"curated_question": {"data_space_id": space_id,
+          "question_text": question, "question_type": "BENCHMARK",
+          "answer_text": ground_truth_sql, "is_deprecated": False},
+          "data_space_id": space_id})
+
+# List benchmarks
+requests.get(f"{host}/api/2.0/data-rooms/{space_id}/curated-questions",
+    headers=headers, params={"question_type": "BENCHMARK"})
+
+# Delete a benchmark
+requests.delete(f"{host}/api/2.0/data-rooms/{space_id}/curated-questions/{qid}",
+    headers=headers)
+```
+
+**Benchmark design principles:**
 - Each benchmark should return a **single scalar value** (one number) — easy to score programmatically
 - Compute ground truth by running the SQL directly against the same tables
 - Use 5% relative tolerance for PASS (rounding differences are expected)
-- Use 15% tolerance for WARN
-- Mix difficulty: simple counts → multi-table joins → ratios → subqueries
-- Include "differentiator" questions that show gap between configured and blank spaces
+- **NEVER include your evaluation (north-star) questions as benchmarks** — benchmarks teach patterns, evals test generalization
+- Teach patterns with different filters/states/time ranges than your eval questions
+- Always run benchmarks **programmatically** after pushing — don't just push and hope
+- Target 100% on synthetic data (controlled), 85%+ on real-world data
 - Re-run benchmarks after every change to instructions or examples
 
 **Scoring framework:**
@@ -212,9 +242,29 @@ Run the same benchmark suite against both. The configured space typically scores
 
 ---
 
-## Part 3 — Genie REST API Reference and Gotchas
+## Part 3 — Genie REST API Reference (for notebook authors)
 
-Hard-won lessons from building and testing Genie spaces programmatically. Follow these to avoid silent failures.
+> **Note for Genie Code:** This section is reference material for humans writing notebooks that call the API directly (e.g., notebooks 03-05 in this workshop). When a user asks you to **create or configure a Genie space**, use your built-in space creation capability — do NOT generate raw API code from this section. Simply create the space with the tables, instructions, sample questions, and curated examples the user describes.
+
+### Two API Families
+
+Genie has two separate API families that target different parts of the UI:
+
+**1. `genie/spaces` API** — for space config, curated SQL examples, sample questions:
+- `POST /api/2.0/genie/spaces` — create a space (with `serialized_space` for full config)
+- `PATCH /api/2.0/genie/spaces/{id}` — update config via `serialized_space`
+- `POST /api/2.0/genie/spaces/{id}/start-conversation` — ask Genie a question
+- `GET /api/2.0/genie/spaces/{id}/conversations/{cid}/messages/{mid}` — poll for answer
+- `GET .../query-result/{aid}` — get the numeric result
+
+**2. `data-rooms` API** — for benchmarks and text instructions:
+- `POST /api/2.0/data-rooms/{id}/curated-questions` — add benchmark (`question_type: BENCHMARK`)
+- `GET /api/2.0/data-rooms/{id}/curated-questions?question_type=BENCHMARK` — list benchmarks
+- `DELETE /api/2.0/data-rooms/{id}/curated-questions/{qid}` — remove a benchmark
+- `POST /api/2.0/data-rooms/{id}/instructions` — add text instruction
+- `GET /api/2.0/data-rooms/{id}/instructions` — list instructions
+
+**Common mistake:** Pushing benchmarks via `serialized_space.instructions.example_question_sqls` — this puts them in the SQL Queries panel, NOT the Benchmark tab. Always use `data-rooms/curated-questions` for benchmarks.
 
 ### Authentication on Serverless
 

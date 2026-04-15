@@ -1,7 +1,42 @@
 # Databricks Genie Workshop — Manufacturing Quality Analytics
 
-A hands-on workshop that teaches you how to build, evaluate, secure, deploy,
-and monitor a Databricks Genie space using a manufacturing quality dataset.
+A hands-on workshop that teaches you how to build, evaluate, and optimize a
+**Databricks Genie** space for manufacturing analytics. You will create a
+fully configured AI assistant that answers natural-language questions about
+OEE, defect rates, scrap, downtime, and safety — then prove its accuracy
+with automated benchmarks.
+
+## Workshop flow
+
+```mermaid
+flowchart LR
+    subgraph data ["1. Data"]
+        NB01["01 Load Data"]
+        NB02["02 Prepare Tables"]
+    end
+    subgraph genie ["2. Build Genie"]
+        NB03["03 Create Spaces"]
+        NB04["04 Benchmarks"]
+        NB05["05 Explore"]
+        NB06["06 Code Skills"]
+    end
+    subgraph prove ["3. Prove It"]
+        NB07["07 A/B Compare"]
+    end
+    subgraph govern ["4. Govern & Deploy"]
+        NB08["08 Security"]
+        NB09["09 App"]
+        NB10["10 Monitoring"]
+        NB11["11 CI/CD"]
+    end
+
+    NB01 --> NB02 --> NB03 --> NB04 --> NB05 --> NB06 --> NB07 --> NB08 --> NB09 --> NB10 --> NB11
+```
+
+**Key outcome (Notebook 07):** The A/B comparison proves that a Genie space
+with curated SQL examples and instructions answers hard analytical questions
+correctly, while the same space without context fails — demonstrating that
+investing in curation is essential.
 
 ## Prerequisites
 
@@ -12,73 +47,91 @@ and monitor a Databricks Genie space using a manufacturing quality dataset.
 
 ## Getting started
 
-1. Import the **`notebooks/`** folder into your Databricks workspace.
-2. Import the **`templates/`** folder into the **same parent directory** as `notebooks/`.
-3. Import the **`skill/`** folder into the **same parent directory** as `notebooks/`.
-
-   Your workspace should look like this:
+1. Import the **`notebooks/`**, **`templates/`**, **`skill/`**, and **`app/`** folders into your Databricks workspace so they sit side-by-side:
 
    ```
    /Workspace/Users/<your_email>/GM-Genie-Workshop/
-     notebooks/                              (all 13 .ipynb files)
-     templates/                              (Genie space template JSON)
-       manufacturing_genie_configured.json
-     skill/                                  (Genie Code skill files)
-       manufacturing-analytics_genie/
-         SKILL.md
+     notebooks/        ← 13 notebooks (00–12)
+     templates/        ← Genie space configuration
+     skill/            ← Genie Code skill file
+     app/              ← Databricks App source
    ```
 
-4. Open **`00_workshop_config`** and set your **catalog** and **schema**.
-5. Run notebooks **01** through **12** in order.
+2. Open **`00_workshop_config`** and set your **catalog** and **schema**.
 
-Every notebook reads your config automatically via `%run ./00_workshop_config`.
+3. Run notebooks **01 → 12** in order. Every notebook reads your config
+   automatically via `%run ./00_workshop_config`.
 
-## First-run checklist
-
-1. Run **01** (prebuild data) top to bottom. After `%pip`, Python restarts — run the **re-set config** cell, then continue.
-2. Run **02** (setup data). Confirm tables and functions are created under your catalog.schema.
-3. Run **03** (create Genie spaces). Confirm output shows three clickable Genie URLs and the `workshop_config` Delta table is written.
-4. Run **04 → 12** in order.
+> **Tip:** After notebook 01's `%pip install`, Python restarts. Re-run the
+> config cell in that notebook, then continue.
 
 ## Notebooks
 
-| # | Notebook | What you'll do |
-|---|----------|---------------|
-| 00 | Workshop Configuration | Set your catalog, schema, and preferences |
-| 01 | Load Workshop Data | Create 7 manufacturing tables (plants, events, quality metrics, …) |
-| 02 | Prepare Data | Build Delta tables, add column comments, create analytics functions |
-| 03 | Create Genie Spaces | Create 3 Genie spaces: Blank, Configured (with examples), No Examples |
-| 04 | Benchmarks & Evaluation | Define 16 benchmark questions and push them to Genie |
-| 05 | Explore with Genie | Ask questions in the Genie UI and verify with reference SQL |
-| 06 | Custom Skills | Extend Genie with domain-specific code skills |
-| 07 | Compare Spaces (A/B) | Measure how curated Q-to-SQL examples improve accuracy |
-| 08 | Security & Governance | Column masking with Unity Catalog — prove Genie respects it |
-| 09 | Deploy an App | Wrap Genie in a branded Databricks App |
-| 10 | Monitoring | Track accuracy, usage, and query performance over time |
-| 11 | CI/CD (optional) | Promote Genie spaces across environments with code |
-| 12 | Cleanup (optional) | Remove all workshop assets (spaces, app, tables, volume) |
+| # | Notebook | What you will do |
+|---|----------|-----------------|
+| 00 | **Workshop Config** | Set your catalog, schema, and preferences |
+| 01 | **Load Data** | Create 7 manufacturing tables (plants, lines, operators, events, quality metrics, safety, feedback) |
+| 02 | **Prepare Data** | Add column comments, create analytics functions |
+| 03 | **Create Genie Spaces** | Create 3 spaces (Blank, Configured, No Examples) |
+| 04 | **Benchmarks** | Push 10 benchmark questions to the Genie Benchmarks tab, run in the UI, fix failures with knowledge snippets and ground truth updates |
+| 05 | **Explore with Genie** | Ask questions in the Genie UI, verify with reference SQL and programmatic spot checks |
+| 06 | **Code Skills** | Use a Genie Code skill and a prompt to create a Genie space — no API code needed |
+| 07 | **A/B Compare** | Prove curated examples matter: run 4 hard questions on both spaces, fix the poor space, then validate in the UI with benchmarks and knowledge snippets |
+| 08 | **Security** | Column masking with Unity Catalog — prove Genie respects row/column security |
+| 09 | **Deploy App** | Wrap Genie in a branded Databricks App |
+| 10 | **Monitoring** | Track accuracy, usage, and query performance over time |
+| 11 | **CI/CD** *(optional)* | Promote Genie spaces across environments with code |
+| 12 | **Cleanup** *(optional)* | Remove all workshop assets |
 
-## Notebook-specific setup notes
+## How the evaluation works
 
-- **06 — Skills:** The skill file is included in `skill/manufacturing-analytics_genie/SKILL.md`. Before running notebook 06, copy this file into your workspace's `.assistant/skills/` directory so Genie Code can discover it.
-- **08 — Security:** References a group name (`admin_group`). Replace with a real group in your workspace, or adjust the masking logic.
-- **09 — App:** Requires `app/app.py`, `app.yaml`, and `requirements.txt` in the workspace. Import the `app/` folder alongside `notebooks/`.
-- **10 — Monitoring:** Queries against `system.access.audit` and `system.query.history` need grants; the notebook handles missing access gracefully.
+```mermaid
+flowchart TD
+    subgraph benchmarks ["Notebook 04: Benchmarks"]
+        B1["Define 10 benchmark questions"]
+        B2["Push to Genie Benchmarks tab"]
+        B3["Run in UI, review failures"]
+        B4["Accept knowledge snippets\nUpdate ground truth"]
+    end
+    subgraph ab ["Notebook 07: A/B Comparison"]
+        A1["4 hard questions"]
+        A2["Phase 1: Run on both spaces"]
+        A3["Phase 2: Fix Poor space\nwith curated examples"]
+        A4["Phase 3: Re-test programmatically"]
+        A5["Phase 4: Validate in UI\nAdd curated example for Q4"]
+    end
+
+    B1 --> B2 --> B3 --> B4
+    A1 --> A2 --> A3 --> A4 --> A5
+```
+
+The 10 benchmarks **teach patterns** (state joins, ratio calculations, shift
+aggregation) using different filters and time ranges. The 4 evaluation
+questions in notebook 07 are intentionally **different** — Genie must
+generalize from the patterns, not memorize answers. This proves the space
+configuration works for real, unseen questions.
+
+## Notebook-specific notes
+
+- **06 — Skills:** Copy `skill/manufacturing-analytics_genie/SKILL.md` into your workspace's `.assistant/skills/` directory before running notebook 06.
+- **08 — Security:** Replace `admin_group` with a real group in your workspace.
+- **09 — App:** Uses `app/app.py`, `app.yaml`, and `requirements.txt`.
+- **10 — Monitoring:** Queries `system.access.audit` and `system.query.history`; the notebook handles missing access gracefully.
 
 ## Repository structure
 
 ```
 ├── notebooks/          13 workshop notebooks (00–12)
-├── templates/          Genie space template JSON (used by notebooks 03 and 07)
+├── templates/          Genie space configuration template
 │   └── manufacturing_genie_configured.json
-├── skill/              Genie Code skill file (used by notebook 06)
+├── skill/              Genie Code skill file
 │   └── manufacturing-analytics_genie/
 │       └── SKILL.md
-├── app/                Databricks App source (used by notebook 09)
+├── app/                Databricks App source
 │   ├── app.py
 │   ├── app.yaml
 │   └── requirements.txt
-└── README.md           This file
+└── README.md
 ```
 
 ## Compute
@@ -89,22 +142,13 @@ All notebooks run on **Serverless** compute. Classic clusters with Unity Catalog
 
 | Symptom | Fix |
 |---------|-----|
-| Notebook 03 fails to create spaces | Check Genie entitlement, SQL warehouse availability, and API permissions for your user. |
-| Wrong catalog in Genie answers | Notebook 03 rewrites template table references from `main.manufacturing_quality_analytics` to your `CATALOG.SCHEMA`. Ensure your widgets in notebook 00 match what you used in 01–02. |
-| Notebook 01 fails after pip install | After `%pip`, Python restarts. Re-run the post-restart config cell with the same catalog/schema, then continue. |
-| Notebook 07 `FileNotFoundError` | The `templates/` folder must be in the workspace at the same level as `notebooks/`. See "Getting started" above. |
-
-## Maintainer notes
-
-The configured Genie space template (instructions, sample questions, curated Q-to-SQL examples) lives in `templates/manufacturing_genie_configured.json`. Notebook 03 embeds this as base64 so Databricks Jobs work without extra file imports.
-
-After editing the template JSON, regenerate the embedded copy:
-
-```bash
-python3 scripts/build_03_notebook.py
-python3 scripts/verify_03_embedded_template.py
-```
+| Notebook 03 fails to create spaces | Check Genie entitlement, SQL warehouse availability, and API permissions. |
+| Wrong catalog in Genie answers | Ensure notebook 00 has the same catalog/schema you used in 01–02. |
+| Notebook 01 fails after pip install | After `%pip`, Python restarts. Re-run the config cell, then continue. |
+| Notebook 07 `FileNotFoundError` | The `templates/` folder must be at the same level as `notebooks/`. |
+| Benchmarks in wrong UI tab | Notebook 04 uses the `data-rooms` API for benchmarks. If benchmarks appear under "SQL Queries," re-run notebook 04. |
 
 ## License and data
 
-Sample data is **synthetic** — generated for training and demos, not real production or customer data.
+Sample data is **synthetic** — generated for training and demos, not real
+production or customer data.
