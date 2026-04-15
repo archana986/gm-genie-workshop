@@ -33,10 +33,14 @@ flowchart LR
     NB01 --> NB02 --> NB03 --> NB04 --> NB05 --> NB06 --> NB07 --> NB08 --> NB09 --> NB10 --> NB11
 ```
 
-**Key outcome (Notebook 07):** The A/B comparison proves that a Genie space
-with curated SQL examples and instructions answers hard analytical questions
-correctly, while the same space without context fails — demonstrating that
-investing in curation is essential.
+## What you will walk away with
+
+- **A production-ready Genie space** with curated instructions, Q-to-SQL examples, and benchmarks that answer manufacturing questions accurately.
+- **Proof that curation matters** (Notebook 07) — the same 4 hard questions pass on a configured space and fail on a blank one, showing that investing in examples and instructions is the difference.
+- **A repeatable evaluation workflow** (Notebook 04) — push benchmarks, run them in the UI, review failures with knowledge snippets, and iterate until 100%.
+- **A Genie Code skill** (Notebook 06) — a reusable domain knowledge file that lets you create new spaces from a simple prompt, no API code required.
+- **Security guardrails** (Notebook 08) — column masking with Unity Catalog, proving Genie respects row/column security policies.
+- **A deployable app** (Notebook 09) — Genie wrapped in a branded Databricks App your users can access directly.
 
 ## Prerequisites
 
@@ -85,31 +89,34 @@ investing in curation is essential.
 
 ## How the evaluation works
 
+**Notebook 04** defines 10 benchmark questions that teach Genie the right SQL patterns:
+
 ```mermaid
 flowchart TD
-    subgraph benchmarks ["Notebook 04: Benchmarks"]
-        B1["Define 10 benchmark questions"]
-        B2["Push to Genie Benchmarks tab"]
-        B3["Run in UI, review failures"]
-        B4["Accept knowledge snippets\nUpdate ground truth"]
-    end
-    subgraph ab ["Notebook 07: A/B Comparison"]
-        A1["4 hard questions"]
-        A2["Phase 1: Run on both spaces"]
-        A3["Phase 2: Fix Poor space\nwith curated examples"]
-        A4["Phase 3: Re-test programmatically"]
-        A5["Phase 4: Validate in UI\nAdd curated example for Q4"]
-    end
+    B1["Define 10 benchmark questions\nwith ground-truth SQL"] --> B2["Push to Genie\nBenchmarks tab"]
+    B2 --> B3["Run in UI\nReview failures"]
+    B3 --> B4["Accept knowledge snippets\nUpdate ground truth"]
+    B4 --> B5{"All passing?"}
+    B5 -->|No| B3
+    B5 -->|Yes| B6["Benchmarks green"]
+```
 
-    B1 --> B2 --> B3 --> B4
-    A1 --> A2 --> A3 --> A4 --> A5
+**Notebook 07** uses 4 harder questions to prove curated examples matter:
+
+```mermaid
+flowchart TD
+    A1["4 hard questions\nnot in benchmarks"] --> A2["Phase 1: Run on\nGood and Poor spaces"]
+    A2 --> A3["Phase 2: Fix Poor space\nby adding curated examples"]
+    A3 --> A4["Phase 3: Re-test\nPoor space passes"]
+    A4 --> A5["Phase 4: Validate in UI\nBenchmark all 4 questions"]
+    A5 --> A6["Add curated example\nto fix Q4"]
+    A6 --> A7["Re-run until 100%"]
 ```
 
 The 10 benchmarks **teach patterns** (state joins, ratio calculations, shift
 aggregation) using different filters and time ranges. The 4 evaluation
-questions in notebook 07 are intentionally **different** — Genie must
-generalize from the patterns, not memorize answers. This proves the space
-configuration works for real, unseen questions.
+questions in notebook 07 are intentionally **different** -- Genie must
+generalize from the patterns, not memorize answers.
 
 ## Notebook-specific notes
 
